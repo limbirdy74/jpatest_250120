@@ -1,12 +1,14 @@
 package com.youngcompany.jpa.controller;
 
-import java.lang.reflect.Member;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.youngcompany.jpa.entity.Member;
 import com.youngcompany.jpa.repository.MemberRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,7 +49,7 @@ public class JpaController {
 		
 		memberRepository.save(member);//save->insert 쿼리를 실행함 
 		
-		return "joinOk";
+		return "redirect:list";
 		
 	}
 	
@@ -70,5 +72,28 @@ public class JpaController {
 		
 		return "redirect:list";
 	}
+	
+	@GetMapping(value = "/list") // 모든 회원 목록 가져오기
+	public String memberlist(Model model) {
+		
+		// List<Member> members = memberRepository.findAll();  // select * from jpamembertbl 이게 기본
+		// select * from jpamembertbl order by bnum desc -> 회원번호의 내림차순 이렇게 할려면 만들어야 한다
+		List<Member> members = memberRepository.findAllByOrderByMnumDesc(); // memberrepository 에 만듬
+				
+		model.addAttribute("members", members);
+		
+		return "list";
+	}
+	
+	@GetMapping(value = "/mlist") // 이름에 특정 글자가 들어간 모든 회원 목록 가져오기
+	public String mlist(Model model) {
+		
+
+		List<Member> members = memberRepository.findByMnameLikeOrderByMnumDesc("%호%"); // 호 자가 들어간 이름은 모두 검색
+				
+		model.addAttribute("members", members);
+		
+		return "list";
+	}	
 
 }
